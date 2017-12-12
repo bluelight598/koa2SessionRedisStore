@@ -17,11 +17,9 @@
 *   配置及初始化
 
 ```javascript
-import Koa from 'koa'
+// session.js
 import store from 'sessionRedisStore';
-
-const app = new Koa()
-app.use(store({
+let session = store({
     key: 'sid',
     cookie: {
         signed: false, //是否要做签名
@@ -37,13 +35,23 @@ app.use(store({
         db: 0, // 数据库index
         keyPrefix: 'myproject:session:prefix:' // redis存储前缀
     }
-}))
+})
+export default session
+```
+
+*   引用中间件
+
+```javascript
+import Koa from 'koa'
+import session from './session';
+const app = new Koa()
+app.use(session)
 ```
 
 *   client用法（更多用法请查看[ioredis文档](https://www.npmjs.com/package/ioredis)）
 
 ```javascript
-import store from 'sessionRedisStore';
+import session from './session';
 let client = store.client
 
 const kickOffUser = async function(userId) { // 清除指定用户的session信息，踢该用户下线
